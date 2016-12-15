@@ -29,14 +29,17 @@
   register: containers
 
 - name: Register the Host machine with the Rancher server
-  docker:
-      image: rancher/agent:v{{ rancher_agent_version }}
-      privileged: yes
-      detach: True
-      volumes: /var/run/docker.sock:/var/run/docker.sock
-      command: "{{ rancher_token.json['registrationUrl'] }}"
-      state: started
+  command: "docker run -d --privileged -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/rancher:/var/lib/rancher rancher/agent:{{ rancher_agent_version }} {{ rancher_token.json['registrationUrl'] }}"
   when: "{{ 'rancher-agent' not in containers.stdout }}"
+
+  # TODO: fix when docker-py is not broken
+  #docker:
+  #    image: rancher/agent:v{{ rancher_agent_version }}
+  #    privileged: yes
+  #    detach: True
+  #    volumes: /var/run/docker.sock:/var/run/docker.sock
+  #    command: "{{ rancher_token.json['registrationUrl'] }}"
+  #    state: started
 
 - name: Wait for the Rancher agent to start
   wait_for: timeout=60

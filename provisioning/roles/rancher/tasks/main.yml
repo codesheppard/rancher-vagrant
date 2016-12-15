@@ -1,11 +1,25 @@
 ---
+- command: "docker ps"
+  register: containers 
+
+- name: Print docker ps out
+  debug: msg=containers.stdout
+
+- name: Print Rancher Container Version
+  debug: msg="docker run --restart=unless-stopped --name {{ rancher_name }} -p {{ rancher_port }}:8080 -d rancher/server:{{ rancher_server_version }}"
+  when: "{{ 'rancher_name' not in containers.stdout }}"
+
 - name: Pull and run the Rancher/server contianer
-  docker:
-      name: "{{ rancher_name }}"
-      image: "rancher/server:{{ rancher_server_version }}"
-      restart_policy: always
-      ports: 
-        - "{{ rancher_port }}:8080"
+  command: "docker run --restart=unless-stopped --name {{ rancher_name }} -p {{ rancher_port }}:8080 -d rancher/server:{{ rancher_server_version }}"
+  when: "{{ 'rancher_name' not in containers.stdout }}"
+
+  #TODO: due to ansible bug with docker-py throws error, revert when bug it fixed
+  #docker:
+  #    name: "{{ rancher_name }}"
+  #    image: "rancher/server:{{ rancher_server_version }}"
+  #    restart_policy: always
+  #    ports: 
+  #      - "{{ rancher_port }}:8080"
 
 - name: Wait for the Rancher server to start
   action: command docker logs {{ rancher_name }}
