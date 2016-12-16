@@ -19,7 +19,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "node2" do |node2|
     node2.vm.box = "bento/ubuntu-14.04"
-    node2.vm.network "private_network", ip: "192.168.111.333"
+    node2.vm.network "private_network", ip: "192.168.111.223"
   end
 
   config.vm.provision "ansible" do |ansible|
@@ -34,7 +34,7 @@ Vagrant.configure("2") do |config|
         "ansible_ssh_port" => "22"
       },
       "node2" => {
-        "ansible_ssh_host" => "192.168.111.333",
+        "ansible_ssh_host" => "192.168.111.223",
         "ansible_ssh_port" => "22"
       }
     }
